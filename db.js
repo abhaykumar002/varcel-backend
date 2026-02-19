@@ -31,60 +31,6 @@ const db = await mysql.createPool({
 
 // I will try to target the top headers and the connection first.
 
-// Initialize Database Tables
-try {
-    await db.query(`
-        CREATE TABLE IF NOT EXISTS doctors (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT,
-            name VARCHAR(255),
-
-            email VARCHAR(255),
-            phone VARCHAR(50),
-            gender VARCHAR(20),
-            dob VARCHAR(50),
-            specialization VARCHAR(255),
-            qualification VARCHAR(255),
-            experience VARCHAR(50),
-            reg_number VARCHAR(100),
-            reg_council VARCHAR(255),
-            clinic_name VARCHAR(255),
-            address TEXT,
-            city VARCHAR(100),
-            state VARCHAR(100),
-            pincode VARCHAR(20),
-            consultation_type VARCHAR(50),
-            available_days TEXT,
-            time_slots TEXT,
-            slot_duration VARCHAR(10),
-            max_patients VARCHAR(50),
-            consultation_fee VARCHAR(50),
-            follow_up_fee VARCHAR(50),
-            online_fee VARCHAR(50),
-            status VARCHAR(50) DEFAULT 'PENDING'
-        )
-    `);
-
-    await db.query(`
-        CREATE TABLE IF NOT EXISTS patients (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT,
-            full_name VARCHAR(150),
-            age INT,
-            gender ENUM('MALE', 'FEMALE', 'OTHER'),
-            phone VARCHAR(20),
-            email VARCHAR(255),
-            address TEXT,
-            emergency_contact VARCHAR(20),
-            medical_notes TEXT,
-            first_visit TINYINT(1) DEFAULT 1,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    `);
-} catch (err) {
-    console.error("Error initializing database tables:", err);
-}
-
 app.put('/updateDoc', async (req, res) => {
     try {
         const { id, status } = req.body;
