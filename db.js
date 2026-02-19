@@ -15,7 +15,7 @@ app.use(express.json({ limit: '50mb' })); // REQUIRED
 import dotenv from 'dotenv';
 dotenv.config();
 
-const db = await mysql.createPool({
+const db = mysql.createPool({
     host: process.env.DB_HOST || "127.0.0.1",
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "ab13ha04y2003",
@@ -474,10 +474,20 @@ app.get('/doctor-appointments', async (req, res) => {
 
 
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Backend running on port ${PORT}`);
+
+// Health Check Route
+app.get('/', (req, res) => {
+    res.status(200).json({ message: "Backend is running", status: "OK" });
 });
+
+const PORT = process.env.PORT || 5000;
+
+// Only runs when NOT in Vercel/Production environment (for local dev)
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Backend running on port ${PORT}`);
+    });
+}
 
 export default app;
 
