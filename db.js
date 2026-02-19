@@ -453,14 +453,6 @@ app.get("/test-db", async (req, res) => {
 });
 
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Backend running on port ${PORT}`);
-});
-
-export default app;
-
-
 app.get('/getAllPatients', async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM patients ORDER BY created_at DESC');
@@ -536,8 +528,12 @@ app.get('/doctor-appointments', async (req, res) => {
 
 
 
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Backend running on port ${PORT}`);
+});
 
-
+export default app;
 
 
 
