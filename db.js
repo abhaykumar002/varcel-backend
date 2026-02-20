@@ -4,7 +4,11 @@ const app = express();
 import mysql from "mysql2/promise";
 
 app.use(cors({
-    origin: ["https://varcel-frontend-zswz.vercel.app"],
+    origin: (origin, callback) => {
+        // Logging origin for debugging 403 errors
+        console.log("Request Origin:", origin);
+        callback(null, true);
+    },
     credentials: true
 }));
 
