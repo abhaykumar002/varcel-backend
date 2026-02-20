@@ -475,7 +475,50 @@ app.get('/doctor-appointments', async (req, res) => {
 
 
 
+
+app.post('/chat', async (req, res) => {
+    try {
+        const { history } = req.body;
+        const URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=";
+        const API_KEY = process.env.GEMINI_API_KEY;
+
+        if (!API_KEY) {
+            return res.status(500).json({ success: false, message: "Server Error: API Key not configured" });
+        }
+
+        const payload = {
+            contents: [
+                {
+                    parts: history.map(item => ({
+                        text: `${item.role === "user" ? "user" : "bot"} : ${item.text}`
+                    }))
+                }
+            ]
+        };
+
+        const response = await fetch(`${URL}${API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (data.candidates && data.candidates.length > 0) {
+            res.json({ success: true, reply: data.candidates[0].content.parts[0].text });
+        } else {
+            res.status(500).json({ success: false, message: "No response from AI" });
+        }
+
+    } catch (error) {
+        console.error("Chatbot Error:", error);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+});
+
+
 // Health Check Route
+
 app.get('/', (req, res) => {
     res.status(200).json({ message: "Backend is running", status: "OK" });
 });
