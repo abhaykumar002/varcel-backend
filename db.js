@@ -483,17 +483,16 @@ app.post('/chat', async (req, res) => {
         const API_KEY = process.env.GEMINI_API_KEY;
 
         if (!API_KEY) {
+            console.error("Chatbot Error: GEMINI_API_KEY is missing in process.env");
             return res.status(500).json({ success: false, message: "Server Error: API Key not configured" });
         }
 
+        // Standard Gemini Multi-turn format
         const payload = {
-            contents: [
-                {
-                    parts: history.map(item => ({
-                        text: `${item.role === "user" ? "user" : "bot"} : ${item.text}`
-                    }))
-                }
-            ]
+            contents: history.map(item => ({
+                role: item.role === "user" ? "user" : "model",
+                parts: [{ text: item.text }]
+            }))
         };
 
         const response = await fetch(`${URL}${API_KEY}`, {
@@ -504,15 +503,25 @@ app.post('/chat', async (req, res) => {
 
         const data = await response.json();
 
+        if (data.error) {
+            console.error("Gemini API Error Detail:", JSON.stringify(data.error, null, 2));
+            return res.status(response.status).json({
+                success: false,
+                message: "Gemini API Error",
+                detail: data.error.message
+            });
+        }
+
         if (data.candidates && data.candidates.length > 0) {
             res.json({ success: true, reply: data.candidates[0].content.parts[0].text });
         } else {
+            console.error("Gemini API Error: No candidates in response", data);
             res.status(500).json({ success: false, message: "No response from AI" });
         }
 
     } catch (error) {
-        console.error("Chatbot Error:", error);
-        res.status(500).json({ success: false, message: "Server Error" });
+        console.error("Chatbot Express Route Error:", error);
+        res.status(500).json({ success: false, message: "Server Error: " + error.message });
     }
 });
 
